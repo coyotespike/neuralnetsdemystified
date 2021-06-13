@@ -1,7 +1,3 @@
-:properties:
-:header-kernel: python3
-:end:
-
 * Part 1, Forward Propagation
 We start off by defining some hyperparameters, constants which establish the
 structure and behavior of the network and are not updated as we train.
@@ -46,10 +42,11 @@ X = [[3, 5],
      [5, 1], 
      [10, 2]]
 y = [75, 82, 93]
+y
 #+END_SRC
 
 #+RESULTS:
-: [75, 82, 93]
+| 75 | 82 | 93 |
 
 #+BEGIN_SRC jupyter-python :session py
 import numpy as np
@@ -86,6 +83,11 @@ y_hat
 #+END_SRC
 
 #+RESULTS:
-: array([[0.37793827],
-:        [0.48852971],
-:        [0.4885244 ]])
+: array([[0.67139173],
+:        [0.6694768 ],
+:        [0.65219914]])
+
+As we can see, these results are completely terrible compared to our actual test
+scores! That is because we are using random weights. Next we need to update our weights.
+
+* Part 3, Back Propagation
