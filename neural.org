@@ -12,7 +12,7 @@ weights for each variable, for each example we have.
 We can do this with matrix multiplication (always remember http://matrixmultiplication.xyz/).
 
 \[  \begin{bmatrix}
-3) & 5 \\
+3 & 5 \\
 5 & 1 \\
 10 & 2
 \end{bmatrix} \begin{bmatrix}
@@ -41,15 +41,15 @@ dimensions it was given.
 
 \[
 a^{(2)} = \begin{bmatrix}
-\sigma(3W_{11} + 5W_{21}) & \sigma(3W_{12} + 5W_{22}) & \sigma(3W_{13} + 5W_{33} \\
-\sigma(5W_{11} + 1W_{21})) & \sigma(5W_{12} + 1W_{22}) & \sigma(5W_{13} + 1W_{33} \\
-\sigma(10W_{11} + 2W_{21})) & \sigma(10W_{12} + 2W_{22}) & \sigma(10W_{13} + 2W_{33} \\
+\sigma(3W_{11} + 5W_{21}) & \sigma(3W_{12} + 5W_{22}) & \sigma(3W_{13} + 5W_{33}) \\
+\sigma(5W_{11} + 1W_{21}) & \sigma(5W_{12} + 1W_{22}) & \sigma(5W_{13} + 1W_{33}) \\
+\sigma(10W_{11} + 2W_{21}) & \sigma(10W_{12} + 2W_{22}) & \sigma(10W_{13} + 2W_{33}) \\
 \end{bmatrix}
 \]
 
 
 So we have $a^{(2)} = f(Z^{(2)})$. We'll then apply one more set of weights to
-get our final output, and then run the activation function on that too.
+get our final output, with dimensions 3 x 1, and then run the activation function on that too.
 
 $Z^{(3)} = a^{(2)} W^{(2)}$, and $\hat{y} = f(Z^{(3)})$
 
@@ -107,4 +107,49 @@ y_hat
 As we can see, these results are completely terrible compared to our actual test
 scores! That is because we are using random weights. Next we need to update our weights.
 
-* Part 3, Back Propagation
+* Part 3, Back Propagation Theory
+
+Our goal now is to quantify how wrong our predictions are, figure out how to
+update our weights in the right direction, and use our wrongess-quantity to
+adjust the weights by some suitable amount.
+
+We could use several measures of wrongness. For instance, we could just take
+$y - \hat{y}$, and that would be fine. Because we're coming up with a single
+weight for all our examples, we would average this. Our loss function would thus
+be Mean Absolute Error, or MAE.
+
+However, Mean Squared Error is more commonly used, although
+[[https://stats.stackexchange.com/questions/470626/why-is-using-squared-error-the-standard-when-absolute-error-is-more-relevant-to][arguments for this are not perfectly convincing]]. It is a little easier to do
+calculus on, and most importantly, because it is a convex function, we can be
+sure it will be defined at 0, and more extreme errors will get penalized more,
+meaning we will learn faster the wronger we are, which is nice.
+
+Mean Squared Error looks like $\sum (y - \hat{y})^2$, and if we divide by 2 to
+help us do calculus later it will still have all the properties we want: $J = \sum \frac{1}{2}
+(y - \hat{y})^2$.
+
+Now that we have a loss function, how do we know how to improve our weights?
+Random guessing will not work, due to the curse of dimensionality. With 6
+weights, assume they might have 1000 possible values each, and we have
+$1000^{6}$ guesses to make!
+
+We could also jiggle each weight up or down a little, and see if the whole thing
+improves. That will work but be slow.
+
+Fortunately we have a better way! We want to know how our cost function J
+changes when $\hat{y}$, or W, changes. This is a derivative! If the derivative
+is positive, we are heading in the wrong direction. We'll keep changing until
+the derivative of our loss function starts getting worse again.
+
+If we consider one weight at a time, then we want to know how J changes when
+just one weight changes, and that's a partial derivative: $\frac{\partial
+J}{\partial W}$.
+
+This is one reason we chose our loss function as we did. It's convex, so we will
+always know which direction to go in. In higher dimensions, the combination of
+all these weights could get us stuck in a local minimum, but if we update our
+weights one at a time (stochastic gradient descent), we might be fine anyway.
+
+Anyway, today we will do batch gradient descent, and update them all at once,
+based on the partial derivative of each.
+
