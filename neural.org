@@ -341,7 +341,7 @@ a_{13} \: \delta^{(3)}_1 + a_{23} \: \delta^{(3)}_2 + a_{33} \: \delta^{(3)}_3 \
 \]
 
 And the cool thing here is that the matrix multiplication is adding up across
-our examples - there's that summation $/Delta$ we took out earlier!
+our examples - there's that summation $\Delta$ we took out earlier!
 
 You can also think of batching gradient as contributing to the overall cost.
 
@@ -381,6 +381,8 @@ NN.costFunctionPrime(X, y)
 : 5
 
 Where does X and y come from? Oh, we're building it a little wonky. I would
-first run, then call costFunctionPrime.
+first run /forward/, then call costFunctionPrime.
 
-Why self.sigmoidPrime(self.Z3)?
+Why ~self.sigmoidPrime(self.Z3)~? Oh, the same as any derivative. If y_hat is a
+function of ~self.sigmoidPrime(self.Z3)~, then to take the derivative of ~y_hat~
+with respect to ~Z3~, we differentiate the underlying function. Which is what we did.
