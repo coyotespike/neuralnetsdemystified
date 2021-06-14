@@ -253,7 +253,9 @@ function, by all our examples with the weights and activation function applied./
 
 If you do all that, you will know just how to change each weight.
 
-** Multiply it out. 
+** Multiply it out
+
+*** The errors
 
 \[  \begin{bmatrix}
 y_1 \\
@@ -285,6 +287,7 @@ np.multiply(fakeYs, fakeSigPrime)
 :        [4],
 :        [9]])
 
+*** The size of each error
 
 \[
 \begin{bmatrix}
@@ -304,19 +307,19 @@ f'(z^{(3)}_3) \\
 
 This is called "the back-propagating error, $\delta^{(3)}$."
 
+*** Multiply together
+
 At this point we want to multiply by $a^{(2)}$, $\delta^{(3)} a^{(2)}$. However,
 we've got
 
-\[
-a^{(2)} = 
-\begin{bmatrix}
+\[ a^{(2)} = \begin{bmatrix}
 a_{11} & a_{12} & a_{13}\\
 a_{21} & a_{22} & a_{23}\\
 a_{31} & a_{32} & a_{33}\\
 \end{bmatrix}
 \]
 
-,and these matrices don't match. You can't multiple 3x1 with 3x3.
+These matrices don't match. You can't multiply 3x1 with 3x3.
 
 We can make it work by transposing and multiplying, which I'll assume is the
 same thing in linear algebra, or something. You can multiply 3x3 with 3x1.
@@ -331,9 +334,9 @@ a_{13} & a_{23} & a_{33}\\
 \delta^{(3)}_2 \\
 \delta^{(3)}_3 \\
 \end{bmatrix} = \begin{bmatrix}
-a_{11} ~ \delta^{(3)}_1 + a_{21} ~ \delta^{(3)}_2 + a_{31} ~ \delta^{(3)}_3 \\
-a_{12} ~ \delta^{(3)}_1 + a_{22} ~ \delta^{(3)}_2 + a_{32} ~ \delta^{(3)}_3 \\
-a_{13} ~ \delta^{(3)}_1 + a_{23} ~ \delta^{(3)}_2 + a_{33} ~ \delta^{(3)}_3 \\
+a_{11} \: \delta^{(3)}_1 + a_{21} \: \delta^{(3)}_2 + a_{31} \: \delta^{(3)}_3 \\
+a_{12} \: \delta^{(3)}_1 + a_{22} \: \delta^{(3)}_2 + a_{32} \: \delta^{(3)}_3 \\
+a_{13} \: \delta^{(3)}_1 + a_{23} \: \delta^{(3)}_2 + a_{33} \: \delta^{(3)}_3 \\
 \end{bmatrix} 
 \]
 
@@ -347,14 +350,11 @@ You can also think of batching gradient as contributing to the overall cost.
 
 
 #+BEGIN_SRC jupyter-python :session py
-# Magic from https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
+# Magic adapted from https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
 # Makes it more convenient to add as I go in the same notebook
 def add_method(cls):
     def decorator(func):
-        @wraps(func) 
-        def wrapper(self, *args, **kwargs): 
-            return func(*args, **kwargs)
-        setattr(cls, func.__name__, wrapper)
+        setattr(cls, func.__name__, func)
         return func
     return decorator
 
@@ -372,33 +372,13 @@ def costFunctionPrime(self, X, y):
     self.delta_3 = np.multiply(-self.wrongness, self.sigPrime) # element-wise
 
     dJdW2 = np.dot(self.a2, self.delta_3)
+    return 5
 
-NN.costFunctionPrime(x, y)
+NN.costFunctionPrime(X, y)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-# [goto error]
-#+begin_example
-
-  NameErrorTraceback (most recent call last)
-  <ipython-input-32-d2ad5f72ac9b> in <module>
-       10     return decorator
-       11 
-  ---> 12 @add_method(Neural_Network)
-       13 def sigmoidPrime(self, z):
-       14   return np.exp(-z) / ((1 + np.exp(-z))**2)
-
-  <ipython-input-32-d2ad5f72ac9b> in decorator(func)
-        3 def add_method(cls):
-        4     def decorator(func):
-  ----> 5         @wraps(func)
-        6         def wrapper(self, *args, **kwargs):
-        7             return func(*args, **kwargs)
-
-  NameError: name 'wraps' is not defined
-#+end_example
-:END:
+: 5
 
 Where does X and y come from? Oh, we're building it a little wonky. I would
 first run, then call costFunctionPrime.
