@@ -17,7 +17,7 @@ We can do this with matrix multiplication (always remember http://matrixmultipli
 10 & 2
 \end{bmatrix} \begin{bmatrix}
 W_{11} & W_{12} & W_{13}\\
-W_{21} & W_{22} & W_{33}\\
+W_{21} & W_{22} & W_{23}\\
 \end{bmatrix}
 \]
  
@@ -80,12 +80,12 @@ class Neural_Network(object):
         self.W2 = np.random.randn(self.hiddenLayersSize, self.outputLayersSize)
 
     def forward(self, X):
-        Z2 = np.dot(X, self.W1)
-        a2 = self.sigmoid(Z2)
+        self.Z2 = np.dot(X, self.W1)
+        self.a2 = self.sigmoid(self.Z2)
 
-        Z3 = np.dot(a2, self.W2)
+        self.Z3 = np.dot(self.a2, self.W2)
 
-        y_hat = self.sigmoid(Z3)
+        y_hat = self.sigmoid(self.Z3)
 
         return y_hat
         
@@ -100,14 +100,14 @@ y_hat
 #+END_SRC
 
 #+RESULTS:
-: array([[0.67139173],
-:        [0.6694768 ],
-:        [0.65219914]])
+: array([[0.76854999],
+:        [0.81874552],
+:        [0.83537981]])
 
 As we can see, these results are completely terrible compared to our actual test
 scores! That is because we are using random weights. Next we need to update our weights.
 
-* Part 3, Back Propagation Theory
+
 
 Our goal now is to quantify how wrong our predictions are, figure out how to
 update our weights in the right direction, and use our wrongess-quantity to
@@ -180,4 +180,227 @@ $\frac{\partial J}{\partial W^{(2)}} = \frac{\partial \sum \frac{1}{2} (y -
 \hat{y})^2}{\partial W^{(2)}}$, since that's what J is.
 
 The sum here is adding the error from each example to create an overall cost.
-The Sum Rule, $\frac{d}{dx}(u + v) = \frac{du}{dx} + \frac{dv}{dx}$, says that we
+The Sum Rule, $\frac{d}{dx}(u + v) = \frac{du}{dx} + \frac{dv}{dx}$, says that
+we can move the summation outside our derivative, which is handy.
+
+$\sum \frac{\partial \frac{1}{2} (y - \hat{y})^2}{\partial W^{(2)}}$
+
+We'll come back and add up later.
+
+Well, next we apply the power rule: $\frac{\partial J}{\partial W^{(2)}} = 2
+\cdot \frac{1}{2} (y - \hat{y})} = (y - \hat{y})$, and isn't that convenient.
+
+That was the outer function, now to follow the chain rule we must take the
+derivative of the inner function.
+
+A better name for back propagation might be, don't stop doing the chain rule, ever!
+
+The $y$ is a constant and goes to 0.
+
+$\frac{\partial J}{\partial W^{(2)}} = (y - \hat{y}) \cdot - \frac{\partial \hat{y}}{\partial W^{(2)}}$
+
+However $\hat{y}$ is itself a function, $\hat{y} = f(z^{(3)})$, and we must apply the chain rule again.
+
+$\frac{\partial \hat{y}}{\partial W^{(2)}} = \frac{\partial \hat{y}}{\partial z^{(3)}} \cdot \frac{\partial z^{(3)}}{\partial W^{(2)}}$
+
+Meaning, again, we want the entire phrase:  
+$- (y - \hat{y}) \cdot \frac{\partial \hat{y}}{\partial z^{(3)}} \cdot \frac{\partial z^{(3)}}{\partial W^{(2)}}$
+
+Now, $f(z^{(3)})$ was our sigmoid function, which is $\frac{1}{1 + e^{-z}}$.
+
+To take this derivative, rewrite as $(1 + e^{-z})^{-1}$, and apply the power
+rule to get $-(1 + e^{-z})^{-2}$, but then we must apply the product rule to get
+$-(1 + e^{-z})^{-2})(\frac{d}{z} 1 + e^{-z})$. Which equals:
+
+$-(1 + e^{-z})^{-2})(\frac{d}{dz}(1 + e^{-z})) = -(1 + e^{-z})^{-2})(-1)(e^{-z}))$
+
+And:
+$\frac{e^{-z}}{(1 + e^{-z})^{2}}$. If you do a lot of algebra there, you can
+also write this as $\sigma(x) \cdot (1 - \sigma(x))$.
+
+Having found $f'(z^{(3)}$, we can slot that in.
+
+
+$- (y - \hat{y}) \cdot \frac{e^{-z}}{(1 + e^{-z})^{2}} \cdot \frac{\partial z^{(3)}}{\partial W^{(2)}}$
+
+And we just need our last term. This is how our output - the sum of the
+activated (first weights * inputs) multiplied by the second weights - changes as
+the second weights change.
+
+Here's the thing, z3 is a linear function with respect to the W2 weights. If
+they go up, the values go up. And the derivative of a linear function - it's
+just a plain ol' slope like we learned in 5th grade. Here the slope is the
+activations, a2.
+
+Our final formula:
+
+$- (y - \hat{y}) \cdot \frac{e^{-z}}{(1 + e^{-z})^{2}} \cdot a^{(2)}$
+
+** Zoom Out a Bit
+
+All that calculus! We wanted to figure out how much our output depended on the
+final set of weights we applied. First we had to apply the power rule. Then, we
+figured out how much our output was changed by our sigmoid function. Then we
+multiplied by the activations.
+
+Remember we'll calculate all this by neuron, by weight. You can think about this
+as: we multiply by each activation, because that is how much they each
+proportionately contributed to the error. Crucially, this is what lets back
+propagation work its magic!
+
+*Our final formula in a nutshell*: /Multiply the size of error, by the derivative of the activation
+function, by all our examples with the weights and activation function applied./ 
+
+If you do all that, you will know just how to change each weight.
+
+** Multiply it out. 
+
+\[  \begin{bmatrix}
+y_1 \\
+y_2 \\
+y_3 \\
+\end{bmatrix} - \begin{bmatrix}
+\hat{y}_1 \\
+\hat{y}_2 \\
+\hat{y}_3 \\
+\end{bmatrix} = \begin{bmatrix}
+y_1 - \hat{y}_1 \\
+y_2 - \hat{y}_2 \\
+y_3 - \hat{y}_3 \\
+\end{bmatrix}
+\]
+
+When we applied sigmoid function, we also got a 3x1 matrix, and sigmoidPrime
+will have the same shape. In other words $f'(z^{(3)}$ is also 3x1, and we can do
+element-wise multiplication.
+
+#+BEGIN_SRC jupyter-python :session py
+fakeYs = [[1], [2], [3]]
+fakeSigPrime = [[1], [2], [3]]
+
+np.multiply(fakeYs, fakeSigPrime)
+#+END_SRC
+#+RESULTS:
+: array([[1],
+:        [4],
+:        [9]])
+
+
+\[
+\begin{bmatrix}
+y_1 - \hat{y}_1 \\
+y_2 - \hat{y}_2 \\
+y_3 - \hat{y}_3 \\
+\end{bmatrix} \cdot \begin{bmatrix}
+f'(z^{(3)}_1) \\
+f'(z^{(3)}_2) \\
+f'(z^{(3)}_3) \\
+\end{bmatrix} = \begin{bmatrix}
+\delta^{(3)}_1 \\
+\delta^{(3)}_2 \\
+\delta^{(3)}_3 \\
+\end{bmatrix} = \delta^{(3)}
+\]
+
+This is called "the back-propagating error, $\delta^{(3)}$."
+
+At this point we want to multiply by $a^{(2)}$, $\delta^{(3)} a^{(2)}$. However,
+we've got
+
+\[
+a^{(2)} = 
+\begin{bmatrix}
+a_{11} & a_{12} & a_{13}\\
+a_{21} & a_{22} & a_{23}\\
+a_{31} & a_{32} & a_{33}\\
+\end{bmatrix}
+\]
+
+,and these matrices don't match. You can't multiple 3x1 with 3x3.
+
+We can make it work by transposing and multiplying, which I'll assume is the
+same thing in linear algebra, or something. You can multiply 3x3 with 3x1.
+
+\[
+\begin{bmatrix}
+a_{11} & a_{21} & a_{31}\\
+a_{12} & a_{22} & a_{32}\\
+a_{13} & a_{23} & a_{33}\\
+\end{bmatrix} \begin{bmatrix}
+\delta^{(3)}_1 \\
+\delta^{(3)}_2 \\
+\delta^{(3)}_3 \\
+\end{bmatrix} = \begin{bmatrix}
+a_{11} ~ \delta^{(3)}_1 + a_{21} ~ \delta^{(3)}_2 + a_{31} ~ \delta^{(3)}_3 \\
+a_{12} ~ \delta^{(3)}_1 + a_{22} ~ \delta^{(3)}_2 + a_{32} ~ \delta^{(3)}_3 \\
+a_{13} ~ \delta^{(3)}_1 + a_{23} ~ \delta^{(3)}_2 + a_{33} ~ \delta^{(3)}_3 \\
+\end{bmatrix} 
+\]
+
+And the cool thing here is that the matrix multiplication is adding up across
+our examples - there's that summation $/Delta$ we took out earlier!
+
+You can also think of batching gradient as contributing to the overall cost.
+
+
+* Part 4
+
+
+#+BEGIN_SRC jupyter-python :session py
+# Magic from https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
+# Makes it more convenient to add as I go in the same notebook
+def add_method(cls):
+    def decorator(func):
+        @wraps(func) 
+        def wrapper(self, *args, **kwargs): 
+            return func(*args, **kwargs)
+        setattr(cls, func.__name__, wrapper)
+        return func
+    return decorator
+
+@add_method(Neural_Network)
+def sigmoidPrime(self, z):
+  return np.exp(-z) / ((1 + np.exp(-z))**2)
+
+@add_method(Neural_Network)
+def costFunctionPrime(self, X, y):
+    self.y_hat = self.forward(X)
+
+    self.sigPrime = self.sigmoidPrime(self.Z3)
+    self.wrongness = y - self.y_hat
+
+    self.delta_3 = np.multiply(-self.wrongness, self.sigPrime) # element-wise
+
+    dJdW2 = np.dot(self.a2, self.delta_3)
+
+NN.costFunctionPrime(x, y)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+# [goto error]
+#+begin_example
+
+  NameErrorTraceback (most recent call last)
+  <ipython-input-32-d2ad5f72ac9b> in <module>
+       10     return decorator
+       11 
+  ---> 12 @add_method(Neural_Network)
+       13 def sigmoidPrime(self, z):
+       14   return np.exp(-z) / ((1 + np.exp(-z))**2)
+
+  <ipython-input-32-d2ad5f72ac9b> in decorator(func)
+        3 def add_method(cls):
+        4     def decorator(func):
+  ----> 5         @wraps(func)
+        6         def wrapper(self, *args, **kwargs):
+        7             return func(*args, **kwargs)
+
+  NameError: name 'wraps' is not defined
+#+end_example
+:END:
+
+Where does X and y come from? Oh, we're building it a little wonky. I would
+first run, then call costFunctionPrime.
+
+Why self.sigmoidPrime(self.Z3)?

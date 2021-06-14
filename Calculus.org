@@ -84,7 +84,7 @@ So we can treat $\Delta x$ and others above as algebraic quantities, but to actu
 find the derivative we then must find the limit as $\Delta x \to 0$. We can work with them
 algebraically before taking the limit, but not use them to actually find the derivative.
 
-*** Sal Khan's Method 
+*** Sal Khan's Method
 Is, naturally, the easiest.
 
 $\frac{dy}{dx} = lim_{\Delta x \to 0} \frac{\Delta y}{\Delta x}$ 
