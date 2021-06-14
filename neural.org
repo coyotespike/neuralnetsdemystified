@@ -160,21 +160,17 @@ based on the partial derivative of each.
 ** Doing the Math
 
 For $W^{(1)}$ we should get:
-\[
 \begin{bmatrix}
 \frac{\partial J}{\partial W_{11}} & \frac{\partial J}{\partial W_{12}} & \frac{\partial J}{\partial W_{13}}\\
 \frac{\partial J}{\partial W_{21}} & \frac{\partial J}{\partial W_{22}} & \frac{\partial J}{\partial W_{33}}\\
 \end{bmatrix}
-\]
  
 And for $W^{(2)}$ we should get:
-\[
 \begin{bmatrix}
 \frac{\partial J}{\partial W_{11}^{(2)}} \\
 \frac{\partial J}{\partial W_{21}^{(2)}} \\
 \frac{\partial J}{\partial W_{31}^{(2)}}
 \end{bmatrix}
-\]
  
 $\frac{\partial J}{\partial W^{(2)}} = \frac{\partial \sum \frac{1}{2} (y -
 \hat{y})^2}{\partial W^{(2)}}$, since that's what J is.
@@ -294,7 +290,7 @@ np.multiply(fakeYs, fakeSigPrime)
 y_1 - \hat{y}_1 \\
 y_2 - \hat{y}_2 \\
 y_3 - \hat{y}_3 \\
-\end{bmatrix} \cdot \begin{bmatrix}
+\end{bmatrix} \begin{bmatrix}
 f'(z^{(3)}_1) \\
 f'(z^{(3)}_2) \\
 f'(z^{(3)}_3) \\
