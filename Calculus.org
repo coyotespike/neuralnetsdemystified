@@ -13,8 +13,9 @@ But this is just our original definition.
 
 ** Proof of Chain Rule
 Prime notation shows the mechanics clearer, Leibniz notation the concept.
-$(f o g)' (x) = f'(g(x)) \middot g'(x)$
-$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}$
+Prime notation: $(f o g)' (x) = f'(g(x)) \cdot g'(x)$
+
+And from Leibniz: $\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}$
 
 Since we are asking about a rate of change, relative to another rate of change,
 which is relative to x, it make sense that any change to x gets amplified as it
@@ -29,9 +30,9 @@ The proof is a straight-up algebraic "chain" of reasoning.
 *** Part A
 Remember $\Delta y = f(a + \Delta x) - f(x)$, and as $\Delta x \rightarrow 0$ we have $\Delta y/\Delta x = f'(a)$.
 
-Let's make $\epsilon$ equal the difference between our difference quotient and the derivative.
+Let's make $\epsilon$ equal the difference between our [[https://en.wikipedia.org/wiki/Difference_quotient][ difference quotient ]] and the derivative.
 
-As $\Delta x \rightarrow 0 \epsilon =  \Delta x \rightarrow 0 (\Delta y/\Delta x - f'(a)) = f'(a) - f'(a) = 0$.
+As $\Delta x \rightarrow 0$, we have $\epsilon = (\frac{\Delta y}{\Delta x} - f'(a)) = f'(a) - f'(a) = 0$.
 
 This lets us do $\epsilon = (\Delta y/\Delta x - f'(a) \Rightarrow \Delta y = f'(a) \Delta x + \epsilon \Delta x$
 
@@ -64,8 +65,11 @@ before - that the change in y relative to the change in x, when functions are co
 depends on the derivatives of both functions.
 
 $\epsilon = (\Delta y)/(\Delta x) - (\Delta y)/(\Delta x)$
+
 $\Delta x \epsilon = \Delta y - (\Delta x)[(\Delta y)/(\Delta x)]$
+
 $\Delta y = (\Delta x)[(\Delta y)/(\Delta x)] + (\Delta x) \epsilon$
+
 $\Delta y = (\Delta x)[(\Delta y)/(\Delta x) + \epsilon]$
 
 $(\Delta y)/(\Delta x) = (\Delta y)/(\Delta u) (\Delta u)/(\Delta x)$
