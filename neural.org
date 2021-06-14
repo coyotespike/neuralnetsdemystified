@@ -113,6 +113,8 @@ Our goal now is to quantify how wrong our predictions are, figure out how to
 update our weights in the right direction, and use our wrongess-quantity to
 adjust the weights by some suitable amount.
 
+** Quantifying wrongness with a loss function
+
 We could use several measures of wrongness. For instance, we could just take
 $y - \hat{y}$, and that would be fine. Because we're coming up with a single
 weight for all our examples, we would average this. Our loss function would thus
@@ -127,6 +129,8 @@ meaning we will learn faster the wronger we are, which is nice.
 Mean Squared Error looks like $\sum (y - \hat{y})^2$, and if we divide by 2 to
 help us do calculus later it will still have all the properties we want: $J = \sum \frac{1}{2}
 (y - \hat{y})^2$.
+
+** Which way to jiggle the weights
 
 Now that we have a loss function, how do we know how to improve our weights?
 Random guessing will not work, due to the curse of dimensionality. With 6
@@ -153,3 +157,27 @@ weights one at a time (stochastic gradient descent), we might be fine anyway.
 Anyway, today we will do batch gradient descent, and update them all at once,
 based on the partial derivative of each.
 
+** Doing the Math
+
+For $W^{(1)}$ we should get:
+\[
+\begin{bmatrix}
+\frac{\partial J}{\partial W_{11}} & \frac{\partial J}{\partial W_{12}} & \frac{\partial J}{\partial W_{13}}\\
+\frac{\partial J}{\partial W_{21}} & \frac{\partial J}{\partial W_{22}} & \frac{\partial J}{\partial W_{33}}\\
+\end{bmatrix}
+\]
+ 
+And for $W^{(2)}$ we should get:
+\[
+\begin{bmatrix}
+\frac{\partial J}{\partial W_{11}^{(2)}} \\
+\frac{\partial J}{\partial W_{21}^{(2)}} \\
+\frac{\partial J}{\partial W_{31}^{(2)}}
+\end{bmatrix}
+\]
+ 
+$\frac{\partial J}{\partial W^{(2)}} = \frac{\partial \sum \frac{1}{2} (y -
+\hat{y})^2}{\partial W^{(2)}}$, since that's what J is.
+
+The sum here is adding the error from each example to create an overall cost.
+The Sum Rule, $\frac{d}{dx}(u + v) = \frac{du}{dx} + \frac{dv}{dx}$, says that we

@@ -1,0 +1,81 @@
+** Proof of Sum Rule
+Proof of (d/dx) [f(x) + g(x)] = (d/dx) f(x) + (d/dx) g(x) from the definition.
+
+We can use the definition of the derivative:
+
+$\frac{d}{dx} f(x) =	\lim_{x\to 0} \frac{f(x+d)-f(x)}{d}$
+
+Therefore, $\frac{d}{dx} [f(x) + g(x)] =	\lim_{x\to 0} \frac{[f(x+d)+ g(x+d)] - [f(x)+g(x)]}{d}$
+
+Let's just rearrange this a little: $\frac{[f(x+d) - f(x) ] + [g(x+d) + g(x)]}{d}$, and then $\frac{f(x+d) - f(x)}{d} + \frac{g(x+d) + g(x)}{d}$.
+
+But this is just our original definition.
+
+** Proof of Chain Rule
+Prime notation shows the mechanics clearer, Leibniz notation the concept.
+$(f o g)' (x) = f'(g(x)) \middot g'(x)$
+$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}$
+
+Since we are asking about a rate of change, relative to another rate of change,
+which is relative to x, it make sense that any change to x gets amplified as it
+ricochets through our little machine.
+
+dy/dx is the result of a function. It is f(x + dx) - f(x) by (x + dx).
+Actually, I suppose they are both infinitesimals, but the dy infinitesimal is
+obtained through a function.
+
+The proof is a straight-up algebraic "chain" of reasoning.
+
+*** Part A
+Remember $\Delta y = f(a + \Delta x) - f(x)$, and as $\Delta x \rightarrow 0$ we have $\Delta y/\Delta x = f'(a)$.
+
+Let's make $\epsilon$ equal the difference between our difference quotient and the derivative.
+
+As $\Delta x \rightarrow 0 \epsilon =  \Delta x \rightarrow 0 (\Delta y/\Delta x - f'(a)) = f'(a) - f'(a) = 0$.
+
+This lets us do $\epsilon = (\Delta y/\Delta x - f'(a) \Rightarrow \Delta y = f'(a) \Delta x + \epsilon \Delta x$
+
+To make $\epsilon$ differentiable, we let it go to 0 when $\Delta x = 0$.
+$\Delta y = f'(a) \Delta x + \epsilon \Delta x$ where $\epsilon \to 0$ as $\Delta x \to 0$.
+
+This is a little obscurantist, because f'(a) and our difference quotient are exactly
+the same thing.
+
+*** Part B
+The stage is now set. Suppose $u = g(x)$ is differentiable at a, and $y = f(u)$ at 
+the same location, but we'll say $b = g(a)$. $f(g(a))$, or $f(b)$.
+
+Then, $\Delta u = g'(a) \Delta x + \epsilon \Delta x$. And this equals $[g'(a) + \epsilon](\Delta x)$.
+
+And, $\Delta y = f'(b) (\Delta u) + \epsilon (\Delta u)$. And, $= [f'(b) + \epsilon](\Delta u)$.
+
+Substituting the first result into the second, we have
+$\Delta y = [f'(b) + \epsilon] [g'(a) + \epsilon](\Delta x)$.
+Now as $\Delta x \to 0$, so does $\Delta u$, and thus both our $\epsilon \to 0$.
+Therefore $\frac{dy}{dx} = (\Delta x \to 0) (\Delta y)/(\Delta x) = (lim \Delta x \to 0) [f'(b) + \epsilon] [g'(a) + \epsilon] = f'(b) g'(a) = f'(g(a)) g'(a)$.
+
+*** This proves the Chain Rule.
+We found a way to represent the change in y as the result of the derivative of
+a point plus a small change, multiplied by the change in x - to show a change in
+y in reference to an already-established rate.
+
+This somewhat sneaky characterization let us see more clearly what we could not
+before - that the change in y relative to the change in x, when functions are composed,
+depends on the derivatives of both functions.
+
+$\epsilon = (\Delta y)/(\Delta x) - (\Delta y)/(\Delta x)$
+$\Delta x \epsilon = \Delta y - (\Delta x)[(\Delta y)/(\Delta x)]$
+$\Delta y = (\Delta x)[(\Delta y)/(\Delta x)] + (\Delta x) \epsilon$
+$\Delta y = (\Delta x)[(\Delta y)/(\Delta x) + \epsilon]$
+
+$(\Delta y)/(\Delta x) = (\Delta y)/(\Delta u) (\Delta u)/(\Delta x)$
+
+But since we are not using infinitesimals, and we use the Leibniz notation because 
+sometimes it shows these relations more clearly, we cannot cancel out $(\Delta u)$.
+Rather, these represent the results of taking the limit, and given any actual
+functions f and g, we would have to apply our usual method of adding an h and
+doing algebra, and so on.
+
+So we can treat $\Delta x$ and others above as algebraic quantities, but to actually
+find the derivative we then must find the limit as $\Delta x \to 0$. We can work with them
+algebraically before taking the limit, but not use them to actually find the derivative.
