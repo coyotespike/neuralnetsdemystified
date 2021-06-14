@@ -64,15 +64,15 @@ This somewhat sneaky characterization let us see more clearly what we could not
 before - that the change in y relative to the change in x, when functions are composed,
 depends on the derivatives of both functions.
 
-$\epsilon = (\Delta y)/(\Delta x) - (\Delta y)/(\Delta x)$
+$\epsilon = (\frac{\Delta y)}{(\Delta x)} - \frac{(\Delta y}{(\Delta x)}$
 
-$\Delta x \epsilon = \Delta y - (\Delta x)[(\Delta y)/(\Delta x)]$
+$\Delta x \epsilon = \Delta y - (\Delta x)[\frac{(\Delta y}{(\Delta x)}]$
 
-$\Delta y = (\Delta x)[(\Delta y)/(\Delta x)] + (\Delta x) \epsilon$
+$\Delta y = (\Delta x)[\frac{(\Delta y}{(\Delta x)}] + (\Delta x) \epsilon$
 
-$\Delta y = (\Delta x)[(\Delta y)/(\Delta x) + \epsilon]$
+$\Delta y = (\Delta x)[\frac{(\Delta y}{(\Delta x)} + \epsilon]$
 
-$(\Delta y)/(\Delta x) = (\Delta y)/(\Delta u) (\Delta u)/(\Delta x)$
+$(\frac{\Delta y)}{(\Delta x)} = (\frac{\Delta y)}{(\Delta u)} \frac{(\Delta u}{(\Delta x)}$
 
 But since we are not using infinitesimals, and we use the Leibniz notation because 
 sometimes it shows these relations more clearly, we cannot cancel out $(\Delta u)$.
