@@ -53,7 +53,7 @@ And, $\Delta y = f'(b) (\Delta u) + \epsilon (\Delta u)$. And, $= [f'(b) + \epsi
 Substituting the first result into the second, we have
 $\Delta y = [f'(b) + \epsilon] [g'(a) + \epsilon](\Delta x)$.
 Now as $\Delta x \to 0$, so does $\Delta u$, and thus both our $\epsilon \to 0$.
-Therefore $\frac{dy}{dx} = (\Delta x \to 0) (\Delta y)/(\Delta x) = (lim \Delta x \to 0) [f'(b) + \epsilon] [g'(a) + \epsilon] = f'(b) g'(a) = f'(g(a)) g'(a)$.
+Therefore $\frac{dy}{dx} = (\Delta x \to 0) \frac{(\Delta y)}{(\Delta x)} = (lim_{\Delta x \to 0}) [f'(b) + \epsilon] [g'(a) + \epsilon] = f'(b) g'(a) = f'(g(a)) g'(a)$.
 
 *** This proves the Chain Rule.
 We found a way to represent the change in y as the result of the derivative of
@@ -64,7 +64,7 @@ This somewhat sneaky characterization let us see more clearly what we could not
 before - that the change in y relative to the change in x, when functions are composed,
 depends on the derivatives of both functions.
 
-$\epsilon = (\frac{\Delta y)}{(\Delta x)} - \frac{(\Delta y}{(\Delta x)}$
+$\epsilon = \frac{\Delta y)}{\Delta x} - \frac{\Delta y}{\Delta x}$
 
 $\Delta x \epsilon = \Delta y - (\Delta x)[\frac{(\Delta y}{(\Delta x)}]$
 
@@ -83,3 +83,26 @@ doing algebra, and so on.
 So we can treat $\Delta x$ and others above as algebraic quantities, but to actually
 find the derivative we then must find the limit as $\Delta x \to 0$. We can work with them
 algebraically before taking the limit, but not use them to actually find the derivative.
+
+*** Sal Khan's Method 
+Is, naturally, the easiest.
+
+$\frac{dy}{dx} = lim_{\Delta x \to 0} \frac{\Delta y}{\Delta x}$ 
+
+If we multiply the last part, we get:
+$lim_{\Delta x \to 0} \frac{\Delta y}{\Delta x} \frac{\Delta u}{\Delta u} = lim_{\Delta x \to 0} \frac{\Delta y}{\Delta u} \frac{\Delta u}{\Delta x}$ 
+
+
+But we're allowed to take the limits separately.
+
+$lim_{\Delta x \to 0} \frac{\Delta y}{\Delta u} \frac{\Delta u}{\Delta x} = lim_{\Delta x \to 0} \frac{\Delta y}{\Delta u} \cdot lim_{\Delta x \to 0} \frac{\Delta u}{\Delta x}$ 
+
+
+And we can change the first x to a u, because as x approaches 0, so does the function of x:
+
+$lim_{\Delta x \to 0} \frac{\Delta y}{\Delta u} \frac{\Delta u}{\Delta x} = lim_{\Delta u \to 0} \frac{\Delta y}{\Delta u} \cdot lim_{\Delta x \to 0} \frac{\Delta u}{\Delta x}$ 
+
+
+And naturally that's $\frac{dy}{du} \frac{du}{dx}$.
+
+(although so far as I can see, when we say u approaches 0 when x does, we are kind of cheating, because we are saying u is 0 in the first but not in the second).
