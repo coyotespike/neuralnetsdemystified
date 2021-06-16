@@ -1,3 +1,6 @@
+[[./images/net.png]]
+
+![net]('./images/net.png')
 * Part 1, Forward Propagation
 We start off by defining some hyperparameters, constants which establish the
 structure and behavior of the network and are not updated as we train.
@@ -108,6 +111,7 @@ As we can see, these results are completely terrible compared to our actual test
 scores! That is because we are using random weights. Next we need to update our weights.
 
 
+* Parts 2 - 4: Gradient Descent and Back Propagation
 
 Our goal now is to quantify how wrong our predictions are, figure out how to
 update our weights in the right direction, and use our wrongess-quantity to
@@ -223,10 +227,13 @@ And we just need our last term. This is how our output - the sum of the
 activated (first weights * inputs) multiplied by the second weights - changes as
 the second weights change.
 
-Here's the thing, z3 is a linear function with respect to the W2 weights. If
+Here's the thing, z3 is a linear function with respect to the W2 weights. Their
+relationship is measured by the activations. If
 they go up, the values go up. And the derivative of a linear function - it's
 just a plain ol' slope like we learned in 5th grade. Here the slope is the
 activations, a2.
+
+(this doesn't sound right to me. We change the weights W2, surely)
 
 Our final formula:
 
@@ -250,7 +257,6 @@ function, by all our examples with the weights and activation function applied./
 If you do all that, you will know just how to change each weight.
 
 ** Multiply it out
-
 *** The errors
 
 \[  \begin{bmatrix}
@@ -341,9 +347,58 @@ our examples - there's that summation $\Delta$ we took out earlier!
 
 You can also think of batching gradient as contributing to the overall cost.
 
+** Once More, with Feeling
+
+Now that we have propagated the error backward to our last set of weights, we
+need to keep going. How did our first set of weights affect the output? We will
+do the same thing, take the partial differential with respect to those weights.
+
+$\frac{\partial J}{\partial W^{(1)}} = \frac{\partial \sum \frac{1}{2} (y -
+\hat{y})^2}{\partial W^{(1)}}$, since that's what J is.
+
+Move the summation outside: 
+$\sum \frac{\partial \frac{1}{2} (y - \hat{y})^2}{\partial W^{(1)}}$
+
+Then $- (y - \hat{y}) \cdot \frac{\partial \hat{y}}{\partial z^{(3)}} \cdot \frac{\partial z^{(3)}}{\partial W^{(1)}}$
+
+Remember that $- (y - \hat{y}) \cdot \frac{\partial \hat{y}}{\partial z^{(3)}}$
+translates to the back-propagating error, $\delta^{(3)}$.
+
+Now we are
+calculating the rate of change of z3 with respec to a2, $$\frac{dz}{da_2}$$, so
+to speak. The slope here equals the weight value for that synapse.
+
+For some reason he says last time we computed the derivative with respect to the
+weights but now we are computing across the synapses.
+
+$\delta^{(3)} \frac{\partial z^{(3)}}{\partial a^{(2)}} \frac{\partial
+a^{(2)}}{\partial W^{(1)}}$
+
+ 
+
+The slope is now equal to the weight value for this synapse, which frankly makes
+more sense than the a2 being the slope as it was last time.
+
+We'll achieve this by multiplying by the transpose:
+
+$\delta^{(3)} (W^{(2)}^T) \frac{\partial a^{(2)}}{\partial W^{(1)}}$
+
+the last term separates into $\frac{\partial a^{(2)}}{\partial z^{(2)}} \frac{\partial z^{(2)}}{\partial W^{(1)}}$
+
+The first part is the whole sigmoid calculation we did before and so we replace
+with $f'(z^{(2)})$.
+
+The second part works out as it did last time with $a^{(2)}$, but with X this time.
+
+So we have: 
+$x^T \delta^{(3)} (W^{(2)}^T) f'(z^{(2)}) = x^T \delta^{(2)}$
+
+I did not fully understand this part and will return once I have reviewed
+partial derivatives in the context of the chain rule, as it feels like we're
+skipping something. In the meantime I will truck onward with neural nets, as ML
+is a practitioner's art.
 
 * Part 4
-
 
 #+BEGIN_SRC jupyter-python :session py
 # Magic adapted from https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
@@ -367,7 +422,13 @@ def costFunctionPrime(self, X, y):
 
     self.delta_3 = np.multiply(-self.wrongness, self.sigPrime) # element-wise
 
-    dJdW2 = np.dot(self.a2, self.delta_3)
+    dJdW2 = np.dot(self.a2.T, self.delta_3)
+
+    self
+
+    self.delta_2 = np.multiply(self.delta_3
+
+
     return 5
 
 NN.costFunctionPrime(X, y)
