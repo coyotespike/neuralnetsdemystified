@@ -1,7 +1,10 @@
+#+PROPERTY: header-args :tangle NeuralNet.py
+* The net
+
 [[./images/net.png]]
 
-![net]('./images/net.png')
 * Part 1, Forward Propagation
+
 We start off by defining some hyperparameters, constants which establish the
 structure and behavior of the network and are not updated as we train.
 
@@ -56,20 +59,20 @@ get our final output, with dimensions 3 x 1, and then run the activation functio
 
 $Z^{(3)} = a^{(2)} W^{(2)}$, and $\hat{y} = f(Z^{(3)})$
 
-#+RESULTS:
 #+BEGIN_SRC jupyter-python :session py
-X = [[3, 5], 
-     [5, 1], 
-     [10, 2]]
-y = [75, 82, 93]
-y
+import numpy as np
+X = np.array([[3, 5],
+             [5, 1],
+             [10, 2]])
+y = np.array([[75], [82], [93]])
 #+END_SRC
 
 #+RESULTS:
-| 75 | 82 | 93 |
+: array([[75],
+:        [82],
+:        [93]])
 
 #+BEGIN_SRC jupyter-python :session py
-import numpy as np
 def sigmoid(z):
     return 1/(1 + np.exp(-z))
 
@@ -91,10 +94,15 @@ class Neural_Network(object):
         y_hat = self.sigmoid(self.Z3)
 
         return y_hat
-        
+
     def sigmoid(self, z):
         return 1/(1 + np.exp(-z))
+#+END_SRC
 
+#+RESULTS:
+
+
+#+BEGIN_SRC jupyter-python :session py :tangle no
 sigmoid(1), sigmoid(np.array([-1, 0, 1])), sigmoid(np.random.randn(3, 3))
 
 NN = Neural_Network()
@@ -103,13 +111,12 @@ y_hat
 #+END_SRC
 
 #+RESULTS:
-: array([[0.76854999],
-:        [0.81874552],
-:        [0.83537981]])
+: array([[0.09039106],
+:        [0.06463066],
+:        [0.06301298]])
 
 As we can see, these results are completely terrible compared to our actual test
 scores! That is because we are using random weights. Next we need to update our weights.
-
 
 * Parts 2 - 4: Gradient Descent and Back Propagation
 
@@ -278,16 +285,13 @@ When we applied sigmoid function, we also got a 3x1 matrix, and sigmoidPrime
 will have the same shape. In other words $f'(z^{(3)}$ is also 3x1, and we can do
 element-wise multiplication.
 
-#+BEGIN_SRC jupyter-python :session py
+#+BEGIN_SRC jupyter-python :session py :tangle no
 fakeYs = [[1], [2], [3]]
 fakeSigPrime = [[1], [2], [3]]
 
 np.multiply(fakeYs, fakeSigPrime)
 #+END_SRC
 #+RESULTS:
-: array([[1],
-:        [4],
-:        [9]])
 
 *** The size of each error
 
@@ -391,7 +395,7 @@ with $f'(z^{(2)})$.
 The second part works out as it did last time with $a^{(2)}$, but with X this time.
 
 So we have: 
-$x^T \delta^{(3)} (W^{(2)}^T) f'(z^{(2)}) = x^T \delta^{(2)}$
+$x^T \delta^{(3)} (W^{(2)T}) f'(z^{(2)}) = x^T \delta^{(2)}$
 
 I did not fully understand this part and will return once I have reviewed
 partial derivatives in the context of the chain rule, as it feels like we're
@@ -400,7 +404,7 @@ is a practitioner's art.
 
 * Part 4
 
-#+BEGIN_SRC jupyter-python :session py
+#+BEGIN_SRC jupyter-python :session py :results value table
 # Magic adapted from https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
 # Makes it more convenient to add as I go in the same notebook
 def add_method(cls):
@@ -414,28 +418,33 @@ def sigmoidPrime(self, z):
   return np.exp(-z) / ((1 + np.exp(-z))**2)
 
 @add_method(Neural_Network)
+def costFunction(self, X, y):
+    self.y_hat = self.forward(X)
+    J = sum(0.5 * (y - self.y_hat)**0.5)
+    return J
+
+@add_method(Neural_Network)
 def costFunctionPrime(self, X, y):
     self.y_hat = self.forward(X)
 
-    self.sigPrime = self.sigmoidPrime(self.Z3)
+    self.sigPrimeZ3 = self.sigmoidPrime(self.Z3)
     self.wrongness = y - self.y_hat
 
-    self.delta_3 = np.multiply(-self.wrongness, self.sigPrime) # element-wise
+    self.delta_3 = np.multiply(-self.wrongness, self.sigPrimeZ3) # element-wise
 
     dJdW2 = np.dot(self.a2.T, self.delta_3)
 
-    self
+    np.dot(X.T, self.delta_3)
 
-    self.delta_2 = np.multiply(self.delta_3
+    self.sigPrimeZ2 = self.sigmoidPrime(self.Z2)
+    self.delta_2 = np.dot(self.delta_3, self.W2.T) * self.sigPrimeZ2
 
+    dJdW1 = np.dot(X.T, self.delta_2)
 
-    return 5
-
-NN.costFunctionPrime(X, y)
+    return dJdW1, dJdW2
 #+END_SRC
 
 #+RESULTS:
-: 5
 
 Where does X and y come from? Oh, we're building it a little wonky. I would
 first run /forward/, then call costFunctionPrime.
@@ -443,3 +452,138 @@ first run /forward/, then call costFunctionPrime.
 Why ~self.sigmoidPrime(self.Z3)~? Oh, the same as any derivative. If y_hat is a
 function of ~self.sigmoidPrime(self.Z3)~, then to take the derivative of ~y_hat~
 with respect to ~Z3~, we differentiate the underlying function. Which is what we did.
+
+** Updating
+#+BEGIN_SRC jupyter-python :session py :tangle no
+NN.costFunction(X, y)
+#+END_SRC
+
+#+RESULTS:
+: array([13.64827723])
+
+#+BEGIN_SRC jupyter-python :session py :tangle no
+dJdW1, dJdW2 = NN.costFunctionPrime(X, y)
+dJdW1, dJdW2
+#+END_SRC
+
+#+RESULTS:
+| array | (((0.13230578 6.74956208 0.26207974) (0.12361459 10.04663462 0.35003568))) | array | (((-0.024160348) (-53.1080763) (-0.0525528428))) |
+
+If we add the gradient to our weights, we go uphill.
+#+BEGIN_SRC jupyter-python :session py :tangle no
+W1 = NN.W1
+W2 = NN.W2
+scalar = 3
+NN.W1 = NN.W1 + scalar * dJdW1
+NN.W2 = NN.W2 + scalar * dJdW2
+cost2 = NN.costFunction(X, y)
+
+NN.W1 = W1
+NN.W2 = W2
+
+cost2
+#+END_SRC
+
+#+RESULTS:
+: array([13.67964497])
+
+If we subtract, we go downhill.
+#+BEGIN_SRC jupyter-python :session py :tangle no
+W1 = NN.W1
+W2 = NN.W2
+scalar = 3
+NN.W1 = NN.W1 - scalar * dJdW1
+NN.W2 = NN.W2 - scalar * dJdW2
+cost3 = NN.costFunction(X, y)
+
+# NN.W1 = W1
+# NN.W2 = W2
+
+cost3
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: /opt/anaconda3/lib/python3.7/site-packages/ipykernel_launcher.py:24: RuntimeWarning: overflow encountered in exp
+: array([13.63838267])
+:END:
+
+* Part 5, Numerical Gradient Checking
+So, computers can't do mathematical limits. They can't really do calculus. But
+that's okay because calculus is all about getting close enough anyway.
+
+To check our work, we can simply toggle up and down a little and check that our cost function has improved.
+
+We want to add $\epsilon$ to each weight and compute the cost function, then subtract from each weight and compute the cost function.
+
+#+BEGIN_SRC jupyter-python :session py
+
+# this is a helper function to get the weights in a simple format
+@add_method(Neural_Network)
+def get_params(self):
+    params = np.concatenate(( self.W1.ravel(), self.W2.ravel() ))
+    return params
+
+# this is a helper function to set the weights
+# it works with the getter to roundtrip the weights
+# it assumes the weights come in as one giant 1D array
+# then we need to chop up that 1d array at the correct places
+# np.reshape can run over a 1d array and make rows and cols out of it
+@add_method(Neural_Network)
+def setParams(self, params):
+    W1_start = 0
+    W1_end = self.hiddenLayersSize * self.inputLayersSize
+    self.W1 = np.reshape(params[W1_start:W1_end], (self.inputLayersSize, self.hiddenLayersSize))
+    W2_end = W1_end + self.hiddenLayersSize * self.outputLayersSize
+    self.W2 = np.reshape(params[W1_end:W2_end], (self.hiddenLayersSize, self.outputLayersSize))
+
+# a helper function to get our gradients, then flatten them into a 1d array
+@add_method(Neural_Network)
+def computeGradients(self, X, y):
+    dJdW1, dJdW2 = self.costFunctionPrime(X, y)
+    return np.concatenate((dJdW1.ravel(), dJdW2.ravel()))
+
+# This does the hard work of getting the params as a 1d array
+# then iterating across them all to add and subtract our epsilon
+@add_method(Neural_Network)
+def computeNumericalGradient(self, X, y):
+    paramsInitial = self.get_params()
+    numgrad = np.zeros(paramsInitial.shape)
+    perturb = np.zeros(paramsInitial.shape)
+    e = 1e-4
+
+    for p in range(len(paramsInitial)):
+        #Set perturbation vector: all values in there are now e
+        perturb[p] = e
+        self.setParams(paramsInitial + perturb)  # matrix addition, element-wise
+        loss2 = self.costFunction(X, y)
+
+        self.setParams(paramsInitial - perturb)
+        loss1 = self.costFunction(X, y)
+
+        #Compute Numerical Gradient
+        numgrad[p] = (loss2 - loss1) / (2*e)
+
+        #Return the value we changed to zero:
+        perturb[p] = 0  # this seems unnecessary though.
+        
+        #Return Params to original value:
+        self.setParams(paramsInitial)
+
+    return numgrad
+
+@add_method(Neural_Network)
+def checkAccuracy(self):
+    grad = self.computeGradients(X,y)
+    numgrad = self.computeNumericalGradient(X, y)
+    return np.linalg.norm(grad - numgrad) / np.linalg.norm(grad + numgrad)
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python :session py :tangle no
+NN.checkAccuracy()
+#+END_SRC
+
+#+RESULTS:
+: 0.9993355295590062
