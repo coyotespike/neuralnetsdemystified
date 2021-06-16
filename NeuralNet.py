@@ -115,7 +115,7 @@ def computeNumericalGradient(self, X, y):
 
         #Return the value we changed to zero:
         perturb[p] = 0  # this seems unnecessary though.
-        
+
         #Return Params to original value:
         self.setParams(paramsInitial)
 
@@ -126,3 +126,27 @@ def checkAccuracy(self):
     grad = self.computeGradients(X,y)
     numgrad = self.computeNumericalGradient(X, y)
     return np.linalg.norm(grad - numgrad) / np.linalg.norm(grad + numgrad)
+
+
+# These methods work, but they quickly run into overflow issues
+## And then result in nan
+@add_method(Neural_Network)
+def takeScaledStep(self, scalar, X, y):
+    dJdW1, dJdW2 = self.costFunctionPrime(X, y)
+    self.W1 = self.W1 - scalar * dJdW1
+    self.W2 = self.W2 - scalar * dJdW2
+
+@add_method(Neural_Network)
+def takeNScaledSteps(self, numSteps, scalar, X, y):
+    for step in range(numSteps):
+        dJdW1, dJdW2 = self.costFunctionPrime(X, y)
+        self.W1 = self.W1 - scalar * dJdW1
+        self.W2 = self.W2 - scalar * dJdW2
+
+NN = Neural_Network()
+cost1 = NN.costFunction(X, y)
+NN.takeNScaledSteps(8, 3, X, y)
+# NN.takeScaledStep(40, X, y)
+cost2 = NN.costFunction(X, y)
+
+print(cost1, cost2)

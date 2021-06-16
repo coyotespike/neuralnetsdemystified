@@ -587,3 +587,24 @@ NN.checkAccuracy()
 
 #+RESULTS:
 : 0.9993355295590062
+
+* Part 6 
+#+BEGIN_SRC jupyter-python :session py
+@add_method(Neural_Network)
+def takeScaledStep(self, scalar, X, y):
+    dJdW1, dJdW2 = self.costFunctionPrime(X, y)
+    self.W1 = self.W1 - scalar * dJdW1
+    self.W2 = self.W2 - scalar * dJdW2
+
+@add_method(Neural_Network)
+def takeNScaledSteps(self, numSteps, scalar, X, y):
+    for step in range(numSteps):
+        dJdW1, dJdW2 = self.costFunctionPrime(X, y)
+        self.W1 = self.W1 - scalar * dJdW1
+        self.W2 = self.W2 - scalar * dJdW2
+#+END_SRC
+
+#+RESULTS:
+| array | ((13.59699416)) | array | ((13.59699416)) |
+
+
