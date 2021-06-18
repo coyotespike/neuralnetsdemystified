@@ -113,6 +113,7 @@ The chain rule is like using silverware at a fine dining experience: start from 
 
 For instance $x^2$ can be thought of as $(x)^2$. Take the derivative of the outer function, $2(x)$, then multiply by the derivative of the inner function, which is $x$ with a derivative of $1$: $2(x) * 1 = 2x$.
 
+\[
 \begin{center}
 \begin{tabular}{ c c }
  Outer & x^4 \\ 
@@ -122,6 +123,7 @@ For instance $x^2$ can be thought of as $(x)^2$. Take the derivative of the oute
  Inner & 2 \cdot 2x \cdot x = 4x^3
 \end{tabular}
 \end{center}
+\]
 
 To take a partial derivative, you take one variable at a time, and treat the other variables like constants. For instance, if you had $2x$, you could split it into $x + x$ and differentiate each separately.
 
