@@ -1,9 +1,14 @@
 import numpy as np
 X = np.array([[3, 5],
              [5, 1],
-             [10, 2]])
-y = np.array([[75], [82], [93]])
+              [10, 2]], dtype=np.float)
+y = np.array([[75], [82], [93]], dtype=np.float)
 
+# # Normalize
+X = X/np.amax(X, axis=0)
+y = y/100 #Max test score is 100
+
+Lambda = 0.0001
 def sigmoid(z):
     return 1/(1 + np.exp(-z))
 
@@ -44,7 +49,8 @@ def sigmoidPrime(self, z):
 @add_method(Neural_Network)
 def costFunction(self, X, y):
     self.y_hat = self.forward(X)
-    J = sum(0.5 * (y - self.y_hat)**0.5)
+    # J = 0.5 * sum((y - self.y_hat)**2)
+    J = sum(0.5 * (y - self.y_hat)**2) / X.shape[0] + Lambda/2 * (sum (self.W1 ** 2) + (self.W2 ** 2))
     return J
 
 @add_method(Neural_Network)
@@ -56,14 +62,12 @@ def costFunctionPrime(self, X, y):
 
     self.delta_3 = np.multiply(-self.wrongness, self.sigPrimeZ3) # element-wise
 
-    dJdW2 = np.dot(self.a2.T, self.delta_3)
-
-    np.dot(X.T, self.delta_3)
+    dJdW2 = np.dot(self.a2.T, self.delta_3) + Lambda * self.W2
 
     self.sigPrimeZ2 = self.sigmoidPrime(self.Z2)
     self.delta_2 = np.dot(self.delta_3, self.W2.T) * self.sigPrimeZ2
 
-    dJdW1 = np.dot(X.T, self.delta_2)
+    dJdW1 = np.dot(X.T, self.delta_2) + Lambda * self.W1
 
     return dJdW1, dJdW2
 
@@ -113,9 +117,6 @@ def computeNumericalGradient(self, X, y):
         #Compute Numerical Gradient
         numgrad[p] = (loss2 - loss1) / (2*e)
 
-        #Return the value we changed to zero:
-        perturb[p] = 0  # this seems unnecessary though.
-
         #Return Params to original value:
         self.setParams(paramsInitial)
 
@@ -139,14 +140,29 @@ def takeScaledStep(self, scalar, X, y):
 @add_method(Neural_Network)
 def takeNScaledSteps(self, numSteps, scalar, X, y):
     for step in range(numSteps):
-        dJdW1, dJdW2 = self.costFunctionPrime(X, y)
-        self.W1 = self.W1 - scalar * dJdW1
-        self.W2 = self.W2 - scalar * dJdW2
+        self.takeScaledStep(scalar, X, y)
+
 
 NN = Neural_Network()
+
+print("our initial prediction: ")
+print(NN.forward(X))
+print("")
+
 cost1 = NN.costFunction(X, y)
-NN.takeNScaledSteps(8, 3, X, y)
-# NN.takeScaledStep(40, X, y)
+NN.takeNScaledSteps(200, 3, X, y)
 cost2 = NN.costFunction(X, y)
 
+print("the cost before and after training: ")
 print(cost1, cost2)
+print("")
+
+print("Sanity check")
+print(NN.forward(X))
+print("")
+# remember, should be .75, .82, .93
+# usually the last one is a good bit too low. I am not sure why.
+
+# check out the gradient at our solution
+# They are all very small, showing we are near to our best solution.
+print(NN.costFunctionPrime(X, y))

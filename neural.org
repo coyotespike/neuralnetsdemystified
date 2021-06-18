@@ -65,6 +65,10 @@ X = np.array([[3, 5],
              [5, 1],
              [10, 2]])
 y = np.array([[75], [82], [93]])
+
+# Normalize
+X = X/np.amax(X, axis=0)
+y = y/100 #Max test score is 100
 #+END_SRC
 
 #+RESULTS:
@@ -420,7 +424,7 @@ def sigmoidPrime(self, z):
 @add_method(Neural_Network)
 def costFunction(self, X, y):
     self.y_hat = self.forward(X)
-    J = sum(0.5 * (y - self.y_hat)**0.5)
+    J = sum(0.5 * (y - self.y_hat)**2)
     return J
 
 @add_method(Neural_Network)
@@ -508,6 +512,8 @@ cost3
 : array([13.63838267])
 :END:
 
+Why? Imagine the cost function, which is a valley, or a bowl. If the gradient is positive, you are on the right side of the valley. If you add, you go uphill. If the gradient is negative, you are on the left side of the valley. If you add a negative number, you move left, that is uphill. In either case we subtract to go downhill.
+
 * Part 5, Numerical Gradient Checking
 So, computers can't do mathematical limits. They can't really do calculus. But
 that's okay because calculus is all about getting close enough anyway.
@@ -564,9 +570,6 @@ def computeNumericalGradient(self, X, y):
         #Compute Numerical Gradient
         numgrad[p] = (loss2 - loss1) / (2*e)
 
-        #Return the value we changed to zero:
-        perturb[p] = 0  # this seems unnecessary though.
-        
         #Return Params to original value:
         self.setParams(paramsInitial)
 
@@ -608,3 +611,44 @@ def takeNScaledSteps(self, numSteps, scalar, X, y):
 | array | ((13.59699416)) | array | ((13.59699416)) |
 
 
+
+The above was my attempt at training. It does not work at all, unless the inputs are normalized.
+
+#+BEGIN_SRC jupyter-python :session py :tangle no
+# # Normalize
+X = X/np.amax(X, axis=0)
+y = y/100 #Max test score is 100
+#+END_SRC
+
+At this point, the tutorial implements BFGS. However, I don't understand this portion conceptually, much less the math, and so I will not implement it at this time.
+
+I feel that gradient descent should now work. I don't understand why we need to work about further mathematical optimization.
+
+It will take the second derivative to get the gradient of the gradient, which provides us more information to move downhill more efficiently.
+
+He then uses SciPy's optimize.minimize(), which already implements this function. This is a further strike against this tutorial, as this provides no intuition at all.
+
+However, I am very happy that I am able to train this network. It is not very accurate, even with many steps taken! But it improves several orders of magnitude over our original random weights.
+
+I understand everything in this and am able to train it. Except for the full partial derivatives math involved in taking the gradient. I am optimistic I will soon fully understand this, as my calculus is returning rapidly.
+
+* Part 7
+A couple of good notes here. As we have 9 neurons, we would like to have 90 training examples, to reduce overfitting.
+
+We could also implement regularization, where we penalize our model for getting overly complex. 
+
+#+BEGIN_SRC jupyter-python :session py
+# regularization parameter
+Lambda = 0.0001
+
+def costFunction(self, X, y):
+    self.y_hat = self.forward(X)
+    J = sum(0.5 * (y - self.y_hat)**2) + Lambda/2 * (sum (self.W1 ** 2) + (self.W2 ** 2))
+    return J
+#+END_SRC
+
+It is not quite that simple, though. Our model might balance out by weighting one set of weights at the expense of the other.
+
+We need to regularize them. To dJdW2 add Lambda * self.W2, and to dJdW1 add Lambda * self.W2.
+
+He also divides by the number of rows in Lambda, the number of examples, I suppose because more examples makes us less likely to overfit and so our cost function should be lower. It is a piece of autoregulation, feedback.
