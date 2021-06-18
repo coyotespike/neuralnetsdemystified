@@ -383,7 +383,6 @@ $\delta^{(3)} \frac{\partial z^{(3)}}{\partial a^{(2)}} \frac{\partial
 a^{(2)}}{\partial W^{(1)}}$
 
  
-
 The slope is now equal to the weight value for this synapse, which frankly makes
 more sense than the a2 being the slope as it was last time.
 

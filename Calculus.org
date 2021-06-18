@@ -106,3 +106,86 @@ $lim_{\Delta x \to 0} \frac{\Delta y}{\Delta u} \frac{\Delta u}{\Delta x} = lim_
 And naturally that's $\frac{dy}{du} \frac{du}{dx}$.
 
 (although so far as I can see, when we say u approaches 0 when x does, we are kind of cheating, because we are saying u is 0 in the first but not in the second).
+** Back Propagation
+I found the video's explanation confusing, but the calculus is very simple.
+
+The chain rule is like using silverware at a fine dining experience: start from the outside and work in.
+
+For instance $x^2$ can be thought of as $(x)^2$. Take the derivative of the outer function, $2(x)$, then multiply by the derivative of the inner function, which is $x$ with a derivative of $1$: $2(x) * 1 = 2x$.
+
+\begin{center}
+\begin{tabular}{ c c }
+ Outer & x^4 \\ 
+     & (x^2)^2 \\  
+ to & 2 x^2 \cdot (x^2)' \\
+    &  2 \cdot 2x \cdot x' \\
+ Inner & 2 \cdot 2x \cdot x = 4x^3
+\end{tabular}
+\end{center}
+
+To take a partial derivative, you take one variable at a time, and treat the other variables like constants. For instance, if you had $2x$, you could split it into $x + x$ and differentiate each separately.
+
+The partial derivative asks "how much did each part contribute?" Here each part contributed $1$.
+
+Our cost function is $J = \sum \frac{1}{2}(y - \hat{y})^2$, and we want to take its derivative so we know how to improve our weights.
+
+We can add it all up later, so we ignore the summation. The derivative of $\frac{1}{2}(y - \hat{y})^2$ is just $ 2 * \frac{1}{2}(y - \hat{y})$ times the derivative of the inner function.
+
+Clearly the 2 and 0.5 multiply out, leaving us with $(y - \hat{y})$ for the first outer function.
+
+For the inner function, $y$ is a constant and disappears. If we separate the negative sign like $(-1) \hat{y}$, it won't disappear but the math is easier.
+
+To differentiate $\hat{y}$, we look at the actual function, which is $\sigma(w2 * x)$, where $x$ is the example that W2 gets. So we differentiate $\sigma$, then differentiate the inner function. Let's differentiate $\sigma$ in a second or two.
+
+At this point our entire derivative is just: $(y - \hat{y}) \cdot \sigma'(w2 * x) \cdot (w2 * x)'$, where we haven't yet figured out the last term.
+
+The last term is easy though. $w2$ is our variable, and $x$ is a constant. It is like normal calculus, where you have to differentiate $2x$ or something, and the derivative is just $2$.
+
+Here the derivative is $x$, which is the result of $\sigma(w1 * x)$, which is more math to do, but we don't have to do any calculus on it, it is just straight multiplication.
+
+We now have $(y - \hat{y}) \cdot \sigma'(w2 * x) \cdot x$, and all we have to do is differentiate $\sigma$.
+
+You can apply the product rule or the quotient rule, whichever you like.
+
+
+To take this derivative, rewrite as $(1 + e^{-z})^{-1}$, and apply the power
+rule to get $-(1 + e^{-z})^{-2}$, but then we must apply the product rule to get
+$-(1 + e^{-z})^{-2})(\frac{d}{z} 1 + e^{-z})$. Which equals:
+
+$-(1 + e^{-z})^{-2})(\frac{d}{dz}(1 + e^{-z})) = -(1 + e^{-z})^{-2})(-1)(e^{-z}))$
+
+And:
+$\frac{e^{-z}}{(1 + e^{-z})^{2}}$. 
+
+If you do a lot of algebra there, you can also write this as $\sigma(x) \cdot (1 - \sigma(x))$.
+That is more easily seen if you work backwards.
+
+$\frac{1}{1 + e^{-z}}(1 - \frac{1}{1 + e^{-z}}) = \frac{1}{1 + e^{-z}} - \frac{1}{( 1 + e^{-z})^2} = \frac{1 + e^{-z} - 1}{( 1 + e^{-z})^2}$
+
+
+Anyway, we have $(-1)(y - \hat{y}) \cdot \frac{e^{-z}}{(1 + e^{-z})^{2}} \cdot (x_2)$. The point is that the big three differentiations here are not very hard to do.
+
+To differentiate the other weights, we do all the same steps, but we treat w2 as a constant.
+
+We start out the same until we get to: $(y - \hat{y}) \cdot \sigma'(w2 * x) \cdot (w2 * x)'$. Here, we treat $w2$ as the constant, but $x$ depends on $w1$, which is what we are interested in now.
+
+Hence the derivative now is $w2 \cdot x'$, which is $\sigma(w1 * x_1)$ (the $x_1$ is the $x$ that w1 sees, not the one that w2 sees after going through w1 and $\sigma$).
+
+Differentiating $\sigma(w1 * x_1)$ works out the same as last time, just with a different $z$ this time.
+
+Our final derivative now is $(-1)(y - \hat{y}) \cdot \frac{e^{-z}}{(1 + e^{-z})^{2}} \cdot (w2) \cdot \frac{e^{-z}}{(1 + e^{-z})^{2}} \cdot x_1$
+
+*** Group Them
+The math is actually pretty simple, if you understand the chain rule, product or quotient rule, and the gist of partial derivatives.
+
+We can get a little more insight into what the calculus is doing if we group things together. For instance, $(y - \hat{y})$ is the error, and $\frac{e^{-z}}{(1 + e^{-z})^{2}}$ holds w2 multipled by x (in the z) and hence shows us how much of a mistake this neuron has made.
+
+We put them under a single notation, called "the back-propagating error, $\delta^{(3)}$."
+
+For w1, we have to multiply again by its own $\frac{e^{-z}}{(1 + e^{-z})^{2}}$. We multiply each error by the size of the neuron, and of its child neuron!
+
+I suppose this means earlier weights get adjusted more; they are responsible for the faults of their children!
+
+When we combine $\delta^{(3)}$ with that whole $w2 \cdot \frac{e^{-z}}{(1 + e^{-z})^{2}}$ bit we call it $\delta^{(2)}$.
+
+To make this all work out with many examples, you have to flip and spin matrices a bit.
