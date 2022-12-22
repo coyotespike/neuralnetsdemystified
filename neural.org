@@ -198,8 +198,7 @@ $\sum \frac{\partial \frac{1}{2} (y - \hat{y})^2}{\partial W^{(2)}}$
 
 We'll come back and add up later.
 
-Well, next we apply the power rule: $\frac{\partial J}{\partial W^{(2)}} = 2
-\cdot \frac{1}{2} (y - \hat{y})} = (y - \hat{y})$, and isn't that convenient.
+Well, next we apply the power rule: $\frac{\partial J}{\partial W^{(2)}} = 2 \cdot \frac{1}{2} (y - \hat{y}) = (y - \hat{y})$, and isn't that convenient.
 
 That was the outer function, now to follow the chain rule we must take the
 derivative of the inner function.
@@ -214,7 +213,7 @@ However $\hat{y}$ is itself a function, $\hat{y} = f(z^{(3)})$, and we must appl
 
 $\frac{\partial \hat{y}}{\partial W^{(2)}} = \frac{\partial \hat{y}}{\partial z^{(3)}} \cdot \frac{\partial z^{(3)}}{\partial W^{(2)}}$
 
-Meaning, again, we want the entire phrase:  
+Meaning, again, we want the entire phrase:
 $- (y - \hat{y}) \cdot \frac{\partial \hat{y}}{\partial z^{(3)}} \cdot \frac{\partial z^{(3)}}{\partial W^{(2)}}$
 
 Now, $f(z^{(3)})$ was our sigmoid function, which is $\frac{1}{1 + e^{-z}}$.
@@ -388,7 +387,7 @@ more sense than the a2 being the slope as it was last time.
 
 We'll achieve this by multiplying by the transpose:
 
-$\delta^{(3)} (W^{(2)}^T) \frac{\partial a^{(2)}}{\partial W^{(1)}}$
+$\delta^{(3)} (W^{(2)})^T \frac{\partial a^{(2)}}{\partial W^{(1)}}$
 
 the last term separates into $\frac{\partial a^{(2)}}{\partial z^{(2)}} \frac{\partial z^{(2)}}{\partial W^{(1)}}$
 
